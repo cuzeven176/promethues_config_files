@@ -1,0 +1,12 @@
+
+groups:
+- name: IvmsWatch
+  rules:
+  - alert: IvmsWatch 
+    expr: namedprocess_namegroup_num_procs{groupname="IvmsWatch"} < 1
+    for: 1m
+    labels:
+      severity: error
+    annotations:
+      summary: "{{$labels.instance}}: IvmsWatch service status"
+      description: "{{$labels.instance}}: IvmsWatch service is down~~ please check this!!"

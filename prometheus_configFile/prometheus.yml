@@ -1,0 +1,104 @@
+# my global config
+global:
+  scrape_interval: 15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ["localhost:9093"]
+
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  - "rules/*.yml"
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: "prometheus"
+
+    # metrics_path defaults to '/metrics'
+    # scheme defaults to 'http'.
+
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  - job_name: "expo_nodes"
+    static_configs:
+      - targets: ["127.0.0.1:9100"]
+        labels:
+          instance: localhost
+          nodename: expo_middle01
+          role: middle
+
+      - targets: ["localhost:9100"]
+        labels:
+          instance: localhost
+          nodename: expo_middle02
+          role: middle
+
+      - targets: ["localhost:9100"]
+        labels:
+          instance: localhost
+          nodename: expo_middle03
+          role: middle
+      - targets: ["localhost:9100"]
+        labels:
+          instance: localhost
+          nodename: expo_business01
+          role: business
+      - targets: ["localhost:9100"]
+        labels:
+          instance: localhost
+          nodename: expo_business02
+          role: business
+
+      - targets: ["localhost:9100"]
+        labels:
+          instance: localhost
+          nodename: expo_business03
+          role: business
+      - targets: ["localhost:9100"]
+        labels:
+           instance: localhost
+           nodename: expo_mysql01
+           role: mysql
+      - targets: ["localhost:9100"]
+        labels:
+           instance: localhost
+           nodename: expo_mysql02
+           role: mysql
+
+  - job_name: "expo_redis"
+    file_sd_configs:
+      - files:
+        - targets-redis-instances.json
+    metrics_path: /scrape
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: 10.1.247.67:9121
+
+  - job_name: "expo_redis_exporter"
+    static_configs:
+      - targets:
+        - localhost:9121
+
+  - job_name: "monio_IvmsWatch"
+    static_configs:
+      - targets: ["localhost:9256"]
+        labels:
+           instance: localhost
+           nodename: icity-app02
+           rule: ivms
+      - targets: ["localhost:9256"]
+        labels:
+           instance: localhost
+           nodename: icity-app03
+           rule: ivms

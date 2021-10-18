@@ -1,0 +1,41 @@
+
+groups:
+- name: node_status_monitor
+  rules:
+  - alert: cpu_usage
+    expr: round(100-(avg(irate(node_cpu_seconds_total{mode="idel",job="expo_nodes"}[5m]))by(instance)*100))>50
+    for: 15s
+    labels:
+      severity: warning
+      team: node
+    annotations:
+      summary: "{{ $labels.instance }} CPU USAGE HIGH!"
+      description: "{{ $labels.instance }} Excessive On  CPU Usage, pleace check! Current Usage {{  $value }}%"
+  - alert: disk_io
+    expr: round((avg(irate(node_disk_io_time_seconds_total[1m]))by(instance))*100)> 60
+    for: 15s
+    labels:
+      severity: warning
+      team: node
+    annotations:
+      summary: "{{ $labels.instance }} Excessive IO usage on incoming disks  "
+      description: "{{ $labels.instance }} Excessive IO usage on incoming disks,please check!!!Current usage rate {{ $value }}%"
+  - alert: Tcp Sessions
+    expr: node_netstat_Tcp_CurrEstab>1000
+    for: 15s
+    labels:
+      severity: warning 
+      team: node
+    annotations:
+      summary: "{{ $labels.mountpoint }} High Of TCP Established!!! "
+      description: " Warning!! {{ $labels.mountpoint }} The High Of Tcp Established!! please check~ Current Connections {{$value}} "
+  - alert: incoming network traffic
+    expr: round(sum(rate(node_network_receive_bytes_total{device!="lo"}[5m])) by (instance))/1024/1024 >10
+    for: 15s
+    labels:
+      severity: warning
+      team: node
+    annotations:
+      summary: "{{ $labels.mountpoint }} Incoming Network Traffic is High!! "
+      description: "warning!!! {{ $labels.mountpoint }} Incoming Network Traffic Usage beyond  10M !! please check~ Current Traffic {{ $value }} " 
+         

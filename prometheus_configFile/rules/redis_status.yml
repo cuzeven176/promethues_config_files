@@ -1,0 +1,24 @@
+
+groups:
+- name: redis_cluster_state
+  rules:
+  - alert: redis_cluster_state
+    expr: redis_cluster_state{job="expo_redis"} == 0
+    for: 15s
+    labels:
+      severity: error
+      team: redis
+    annotations:
+      summary: "{{ $labels.instance }} redis server down!"
+      description: "{{ $labels.instance }} redis server down  please check ！！！"
+- name: redis_cluster_connections
+  rules:
+  - alert: redis_cluster_connections
+    expr: redis_cluster_known_nodes{job="expo_redis_exporter"}!= 6
+    for: 15s
+    labels:
+      severity: warning
+      team: redis
+    annotations:
+      summary: "warning!! redis cluster nodes down!! "
+      description: "redis cluster nodes down please check this!"
